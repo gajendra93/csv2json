@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Foodgrains crop vs Production(2013)</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.3.0/d3.min.js"></script>
+	<!-- <script src="http://d3js.org/d3.v4.min.js"></script> -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" />
+	<link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+	
+	<!-- Foodgrain Crops -->
+	<h2>Foodgrain Crops vs Production, for the year 2013</h2>
+	<hr>
+	<div class="container">
+		<ul class="list-inline">
+			<li><a href="../index.html"> Home </a></li>
+			<li><a href="oilseeds.html"> Oilseed </a></li>
+			<li><a href="foodgrains.html"> Foodgrains </a></li>
+			<li><a href="commercial.html"> Commercial </a></li>
+			<li><a href="southern.html"> Southern </a></li>
+		</ul>
+	</div>
+	<script>
+		// set the dimensions of the canvas
+		var margin = {top: 20, right: 40, bottom: 140, left: 50},
+		    width = 900 - margin.left - margin.right,
+		    height = 450 - margin.top - margin.bottom;
+
+		// set the ranges
+		var x = d3.scaleBand().rangeRound([0, width]).padding(0.2);
+
+		var y = d3.scaleLinear().rangeRound([height, 0]);
+
+		// add the SVG element
+		var svg = d3.select("body").append("svg")
+		    .attr("width", width + margin.left + margin.right)
+		    .attr("height", height + margin.top + margin.bottom)
+		    .append("g")
+		    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+		// load the data
+		d3.json("../json/Foodgrains_13.json", function(error, data) {
+		    data.forEach(function(d) {
+		        d["foodgrains crop type"] = d["foodgrains crop type"];
+		        d["production"] = +d["production"];
+	    	});
+		
+		  	// scale the range of the data
+			x.domain(data.map(function(d) { return d["foodgrains crop type"]; }));
+			y.domain([0, d3.max(data, function(d) { return d["production"]; })]).nice();
+
+		  	// add axis
+		  	svg.append("g")
+		      	.attr("class", "x axis")
+		      	.attr("transform", "translate(0," + height + ")")
+		      	.call(d3.axisBottom(x))
+		    	.selectAll("text")
+		      	.style("text-anchor", "end")
+		      	.attr("dx", "-1.2em")
+		      	.attr("dy", "-.20em")
+		      	.attr("transform", "rotate(-65)" );
+
+		  	svg.append("g")
+		      	.attr("class", "y axis")
+		      	.call(d3.axisLeft(y))
+		    	.append("text")
+		      	.attr("transform", "rotate(-90)")
+		      	.attr("dx", "-7.5em")
+		      	.attr("dy", "-2.5em")
+		      	.style("text-anchor", "end")
+		      	.text("Production (in Ton mn)");
+
+
+			// Add bar chart
+		  	svg.selectAll("bar")
+		      	.data(data)
+		    	.enter().append("rect")
+		      	.attr("class", "bar")
+		      	.attr("x", function(d) { return x(d["foodgrains crop type"]); })
+		      	.attr("width", x.bandwidth())
+		      	.attr("y", function(d) { return y(d["production"]); })
+		      	.attr("height", function(d) { return height - y(d["production"]); });
+
+		});
+
+	</script>
+	<!-- End Foodgrain Crops -->
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<!-- Latest Bootstrap minified Javascript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+</body>
+</html>

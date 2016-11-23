@@ -1,0 +1,43 @@
+body {
+	text-align: center;
+}
+.types {
+	margin: 20px auto;
+}
+.types img {
+	width: 450px;
+}
+.types img:hover {
+	box-shadow: 1px 1px 5px 0.5px #555;
+	transform: scale(1.05);
+}
+.bar {
+	fill: green;
+}
+.bar:hover {
+	fill: orange;
+}
+.axis {
+    font: 10px sans-serif;
+}
+
+.axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 60px;
+  height: 24px;
+  padding: 5px;
+  font: 12px sans-serif;
+  color: red;
+  background: black;
+  font-weight: bold;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}

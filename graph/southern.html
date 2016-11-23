@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Southern States Rice Production vs Year</title>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.3.0/d3.min.js"></script> -->
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" />
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body>
+    
+    <!-- Southern State Rice Production -->
+    <h2> Southern States Rice Production vs Year </h2>
+    <hr>
+    <div class="container">
+        <ul class="list-inline">
+            <li><a href="../index.html"> Home </a></li>
+            <li><a href="oilseeds.html"> Oilseed </a></li>
+            <li><a href="foodgrains.html"> Foodgrains </a></li>
+            <li><a href="commercial.html"> Commercial </a></li>
+            <li><a href="southern.html"> Southern </a></li>
+        </ul>
+    </div>
+    <script>
+
+        var margin={top:20, bottom:165, left:100, right:100},
+            width=800-margin.left-margin.right,
+            height=500-margin.top-margin.bottom;
+
+        var horizontal=d3.scale.ordinal().rangeRoundBands([0,width],0.25),
+            vertical=d3.scale.linear().rangeRound([height,0]);
+
+        var color = d3.scale.category10();
+        var xAxis=d3.svg.axis()
+            .scale(horizontal)
+            .orient("bottom");
+
+        var yAxis=d3.svg.axis()
+            .scale(vertical)
+            .orient("left");
+
+        var svg=d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        d3.json("../json/South_State.json",function(err,data){
+            if (err) throw error;
+
+            data.forEach(function(d) {
+                d["year"] = d["year"];
+                d["Andhra Pradesh"] = +d["Andhra Pradesh"];
+                d["Karnataka"] = +d["Karnataka"];
+                d["Kerala"] = +d["Kerala"];
+                d["Tamil Nadu"] = +d["Tamil Nadu"];
+            });
+            var xData=["Andhra Pradesh", "Karnataka", "Kerala", "Tamil Nadu"];
+            var dataIntermediate = xData.map(function (c) {
+                return data.map(function (d) {
+                    return {x: d["year"], y: d[c]};
+                });
+            });
+            var dataStackLayout = d3.layout.stack()(dataIntermediate);
+            
+            horizontal.domain(dataStackLayout[0].map(function (d) {
+                return d.x;
+            }));
+
+            vertical.domain([0,
+                d3.max(dataStackLayout[dataStackLayout.length - 1],
+                    function(d) { return d.y0 + d.y})
+            ]).nice();
+            
+            var layer = svg.selectAll(".stack")
+                .data(dataStackLayout)
+                .enter().append("g")
+                .attr("class", "stack")
+                .style("fill", function (d, i) {
+                    return color(i);
+                });
+            
+            layer.selectAll("rect")
+                .data(function (d) {
+                    return d ;
+                })
+                .enter().append("rect")
+                .attr("x", function (d) {
+                    return horizontal(d.x);
+                })
+                .attr("y", function (d) {
+                    return vertical(d.y + d.y0);
+                })
+                .attr("height", function (d) {
+                    return vertical(d.y0) - vertical(d.y + d.y0);
+                })
+                .attr("width", horizontal.rangeBand());
+         
+            svg.append("g")
+                .attr("class", "axis")
+                .attr("transform", "translate(0," + (height)+ ")")
+                .call(xAxis)
+                .selectAll("text")
+                .attr("y", 3)
+                .attr("x", -35)
+                .attr("transform", "rotate(-65)")
+                .style("text-anchor", "start");
+
+            svg.append("g")
+                .attr("class", "axis")
+                .call(yAxis)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("dx","-10em")
+                .attr("dy","-4em")
+                .style("text-anchor", "end")
+                .style("font-size","14px")
+                .text("Production");
+
+            var legend = svg.selectAll(".legend")
+                .data(color.domain().slice())
+                .enter().append("g")
+                .attr("class", "legend")
+                .attr("transform", function(d, i) { return "translate(0," + i * 20 +")"; });
+                
+            legend.append("rect")
+                .attr("x", width + 80)
+                .attr("width", 18)
+                .attr("height", 18)
+                .style("fill", color);
+                
+            legend.append("text")
+                .attr("x", width + 74)
+                .attr("y", 9)
+                .attr("dy", ".35em")
+                .style("text-anchor", "end")
+                .style("fill","green")
+                .style("font-size","15px")
+                .text(function(d,i) { return xData[i]; });
+        });
+
+    </script>
+    <!-- End Southern State Rice Production -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Latest Bootstrap minified Javascript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+</body>
+</html>

@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-fs.readFile('Production-Department_of_Agriculture_and_Cooperation_1.csv', (err, data) => {
+fs.readFile('source/Production-Department_of_Agriculture_and_Cooperation_1.csv', (err, data) => {
 	var res_oil = [];
 	var res_food = [];
 	var res_comm = [];
@@ -106,7 +106,9 @@ fs.readFile('Production-Department_of_Agriculture_and_Cooperation_1.csv', (err, 
 
 	  			});
 	  			year_i++;
-	  			res_south.push(obj);
+	  			if(!(obj["Andhra Pradesh"] == "0" && obj["Karnataka"] == "0" && obj["Kerala"] == "0" &&
+	  			obj["Tamil Nadu"] == "0"))
+	  				res_south.push(obj);
 	  		}
 	  		
 	  	});// Southern States Rice Production vs Year
@@ -133,7 +135,7 @@ fs.readFile('Production-Department_of_Agriculture_and_Cooperation_1.csv', (err, 
 		***************************/
 
 		//Oilseed JSON Creation
-		fs.writeFile('Oilseeds_13.json', JSON.stringify(res_oil), (err) => {
+		fs.writeFile('json/Oilseeds_13.json', JSON.stringify(res_oil), (err) => {
 			if(err)
 				console.error(err);
 			else
@@ -141,7 +143,7 @@ fs.readFile('Production-Department_of_Agriculture_and_Cooperation_1.csv', (err, 
 		});
 
 		//Foodgrains JSON Creation
-		fs.writeFile('Foodgrains_13.json', JSON.stringify(res_food), (err) => {
+		fs.writeFile('json/Foodgrains_13.json', JSON.stringify(res_food), (err) => {
 			if(err)
 				console.error(err);
 			else
@@ -151,20 +153,24 @@ fs.readFile('Production-Department_of_Agriculture_and_Cooperation_1.csv', (err, 
 		//Commercial JSON Creation
 		var year = 1993;
 		sum_comm.map(function(prod) {
-			var obj = {};
-			obj["year"] = "" + year++;
-			obj["Aggregate Value"] = "" + prod;
-			res_comm.push(obj);
+			if(prod > 0) {
+				var obj = {};
+				obj["year"] = "" + year;
+				obj["Aggregate Value"] = "" + prod;
+				res_comm.push(obj);
+			}
+			year++;
 		});
-		fs.writeFile('Commercial_agg.json', JSON.stringify(res_comm), (err) => {
+		fs.writeFile('json/Commercial_agg.json', JSON.stringify(res_comm), (err) => {
 			if(err)
 				console.error(err);
 			else
 				console.log('File Created: Commercial_agg.json');
+			console.log(res_comm);
 		});
 
 		//Southern States 
-		fs.writeFile('South_State.json', JSON.stringify(res_south), (err) => {
+		fs.writeFile('json/South_State.json', JSON.stringify(res_south), (err) => {
 			if(err)
 				console.error(err);
 			else
